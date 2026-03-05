@@ -1,0 +1,35 @@
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+build/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# generated content
+local-server/outputs/
+local-server/lora_weights/
+local-server/training_data/
+
+# os
+.DS_Store
+Thumbs.db
+
+# misc
+*.log
+.vercel
