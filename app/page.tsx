@@ -5,10 +5,21 @@ import QueueStats from "@/components/QueueStats";
 import PromptForm from "@/components/PromptForm";
 import VideoGallery from "@/components/VideoGallery";
 import TemplateManager from "@/components/TemplateManager";
+import ScriptBuilder from "@/components/ScriptBuilder";
+import SeriesStudio from "@/components/SeriesStudio";
+
+type Tab = "gallery" | "templates" | "script" | "series";
+
+const TABS: { value: Tab; label: string }[] = [
+  { value: "gallery", label: "Gallery" },
+  { value: "templates", label: "Templates" },
+  { value: "script", label: "Script" },
+  { value: "series", label: "Series" },
+];
 
 export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const [tab, setTab] = useState<"gallery" | "templates">("gallery");
+  const [tab, setTab] = useState<Tab>("gallery");
 
   const handleGenerate = () => setRefreshKey((k) => k + 1);
 
@@ -24,18 +35,18 @@ export default function Dashboard() {
             Kling + Wan2.1 · short-form video at scale
           </p>
         </div>
-        <div className="flex gap-2">
-          {(["gallery", "templates"] as const).map((t) => (
+        <div className="flex gap-1">
+          {TABS.map((t) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={t.value}
+              onClick={() => setTab(t.value)}
               className={`text-xs px-4 py-2 rounded-lg capitalize transition-colors ${
-                tab === t
+                tab === t.value
                   ? "bg-zinc-800 text-zinc-100"
                   : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
-              {t}
+              {t.label}
             </button>
           ))}
         </div>
@@ -44,15 +55,16 @@ export default function Dashboard() {
       {/* Queue stats — always visible */}
       <QueueStats />
 
-      {/* Prompt input — always visible */}
-      <PromptForm onSubmit={handleGenerate} />
+      {/* Single prompt — only on gallery/templates tabs */}
+      {(tab === "gallery" || tab === "templates") && (
+        <PromptForm onSubmit={handleGenerate} />
+      )}
 
       {/* Tab content */}
-      {tab === "gallery" ? (
-        <VideoGallery refreshKey={refreshKey} />
-      ) : (
-        <TemplateManager onGenerate={handleGenerate} />
-      )}
+      {tab === "gallery" && <VideoGallery refreshKey={refreshKey} />}
+      {tab === "templates" && <TemplateManager onGenerate={handleGenerate} />}
+      {tab === "script" && <ScriptBuilder onQueue={handleGenerate} />}
+      {tab === "series" && <SeriesStudio onQueue={handleGenerate} />}
     </div>
   );
 }
