@@ -72,7 +72,8 @@ create table if not exists characters (
   appearance  text not null,
   personality text not null,
   role        text not null,
-  backstory   text
+  backstory   text,
+  voice_style text not null default 'dramatic' check (voice_style in ('terse', 'dramatic', 'sarcastic', 'warm', 'cold', 'chaotic'))
 );
 
 create index if not exists characters_series_id_idx on characters(series_id);

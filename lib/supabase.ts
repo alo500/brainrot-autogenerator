@@ -204,6 +204,7 @@ export async function saveSeries(
         personality: c.personality,
         role: c.role,
         backstory: c.backstory,
+        voice_style: c.voiceStyle ?? "dramatic",
       }))
     );
     if (charsError) throw charsError;
@@ -348,6 +349,7 @@ function dbRowToCharacter(row: Record<string, unknown>): Character {
     personality: row.personality as string,
     role: row.role as Character["role"],
     backstory: row.backstory as string,
+    voiceStyle: (row.voice_style as Character["voiceStyle"]) ?? "dramatic",
   };
 }
 

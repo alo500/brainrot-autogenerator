@@ -12,6 +12,29 @@ const STYLES: { value: ScriptStyle; label: string; desc: string }[] = [
   { value: "drama", label: "Drama", desc: "High stakes + cinematic tension" },
 ];
 
+const ANGLE_LABELS: Record<string, string> = {
+  shocking_stat: "Shocking Stat",
+  bold_claim: "Bold Claim",
+  question: "Question",
+};
+
+const ANGLE_COLORS: Record<string, string> = {
+  shocking_stat: "border-amber-500 bg-amber-950 text-amber-200",
+  bold_claim: "border-red-500 bg-red-950 text-red-200",
+  question: "border-cyan-500 bg-cyan-950 text-cyan-200",
+};
+
+const ANGLE_BADGE: Record<string, string> = {
+  shocking_stat: "text-amber-400 bg-amber-950 border-amber-800",
+  bold_claim: "text-red-400 bg-red-950 border-red-800",
+  question: "text-cyan-400 bg-cyan-950 border-cyan-800",
+};
+
+interface HookVariant {
+  angle: string;
+  text: string;
+}
+
 interface Props {
   onQueue?: () => void;
 }
@@ -27,6 +50,34 @@ export default function ScriptBuilder({ onQueue }: Props) {
   const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // A/B hook tester state
+  const [testingHooks, setTestingHooks] = useState(false);
+  const [hookVariants, setHookVariants] = useState<HookVariant[] | null>(null);
+  const [selectedHook, setSelectedHook] = useState<string | null>(null);
+
+  async function handleTestHooks() {
+    if (!topic.trim()) return;
+    setTestingHooks(true);
+    setHookVariants(null);
+    setSelectedHook(null);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/script/hooks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, style }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setHookVariants(data.hooks);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate hooks");
+    } finally {
+      setTestingHooks(false);
+    }
+  }
+
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
     if (!topic.trim()) return;
@@ -39,7 +90,7 @@ export default function ScriptBuilder({ onQueue }: Props) {
       const res = await fetch("/api/script", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, style }),
+        body: JSON.stringify({ topic, style, hook: selectedHook ?? undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -110,12 +161,78 @@ export default function ScriptBuilder({ onQueue }: Props) {
           ))}
         </div>
 
+        {/* A/B Hook tester */}
+        <div className="border border-zinc-700 rounded-lg p-3 space-y-3 bg-zinc-950/50">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-zinc-400 font-semibold uppercase tracking-widest">
+              Hook A/B Tester
+            </span>
+            <button
+              type="button"
+              onClick={handleTestHooks}
+              disabled={testingHooks || !topic.trim()}
+              className="text-xs bg-zinc-700 hover:bg-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-200 font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {testingHooks ? "Testing..." : "A/B Test Hooks"}
+            </button>
+          </div>
+
+          {hookVariants && (
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">
+                Pick a hook, or skip to let Claude choose:
+              </p>
+              {hookVariants.map((h) => (
+                <button
+                  key={h.angle}
+                  type="button"
+                  onClick={() =>
+                    setSelectedHook(selectedHook === h.text ? null : h.text)
+                  }
+                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    selectedHook === h.text
+                      ? ANGLE_COLORS[h.angle] ?? "border-violet-500 bg-violet-950 text-violet-200"
+                      : "border-zinc-700 bg-zinc-800 hover:border-zinc-600"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                        ANGLE_BADGE[h.angle] ?? "text-zinc-400 bg-zinc-800 border-zinc-700"
+                      }`}
+                    >
+                      {ANGLE_LABELS[h.angle] ?? h.angle}
+                    </span>
+                    {selectedHook === h.text && (
+                      <span className="text-xs text-emerald-400">Selected</span>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold text-zinc-100">{h.text}</p>
+                </button>
+              ))}
+              {selectedHook && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedHook(null)}
+                  className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  Clear selection (let Claude choose)
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         <button
           type="submit"
           disabled={generating || !topic.trim()}
           className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
         >
-          {generating ? "Generating script..." : "Generate Script"}
+          {generating
+            ? "Generating script..."
+            : selectedHook
+            ? "Generate Script with Selected Hook"
+            : "Generate Script"}
         </button>
 
         {error && (

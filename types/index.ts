@@ -94,6 +94,7 @@ export interface Character {
   personality: string;
   role: "protagonist" | "antagonist" | "supporting";
   backstory: string;
+  voiceStyle: "terse" | "dramatic" | "sarcastic" | "warm" | "cold" | "chaotic";
 }
 
 export type EpisodeStatus = "scripted" | "queued" | "generating" | "completed";

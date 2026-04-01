@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import type { VideoJob } from "@/types";
 
@@ -44,19 +45,43 @@ export default function VideoGallery({ refreshKey }: Props) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {jobs.map((job) => (
-        <VideoCard key={job.id} job={job} />
+        <VideoCard key={job.id} job={job} onRetry={() => mutate()} />
       ))}
     </div>
   );
 }
 
-function VideoCard({ job }: { job: VideoJob }) {
+function VideoCard({
+  job,
+  onRetry,
+}: {
+  job: VideoJob;
+  onRetry: () => void;
+}) {
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+
   const timeAgo = (iso: string) => {
     const diff = (Date.now() - new Date(iso).getTime()) / 1000;
     if (diff < 60) return `${Math.floor(diff)}s ago`;
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     return `${Math.floor(diff / 3600)}h ago`;
   };
+
+  async function handleRetry() {
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      const res = await fetch(`/api/jobs/${job.id}/retry`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      onRetry();
+    } catch (err) {
+      setRetryError(err instanceof Error ? err.message : "Retry failed");
+    } finally {
+      setRetrying(false);
+    }
+  }
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden group">
@@ -113,6 +138,20 @@ function VideoCard({ job }: { job: VideoJob }) {
           <p className="text-xs text-red-400 truncate" title={job.error}>
             {job.error}
           </p>
+        )}
+
+        {/* Retry button for failed jobs */}
+        {job.status === "failed" && (
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className="w-full text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed border border-zinc-700 hover:border-zinc-600 text-zinc-300 font-medium py-1.5 rounded-lg transition-colors"
+          >
+            {retrying ? "Retrying..." : "Retry"}
+          </button>
+        )}
+        {retryError && (
+          <p className="text-xs text-red-400">{retryError}</p>
         )}
       </div>
     </div>

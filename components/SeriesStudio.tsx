@@ -303,6 +303,14 @@ export default function SeriesStudio({ onQueue }: Props) {
               </div>
               <p className="text-xs text-zinc-400 italic">{c.appearance}</p>
               <p className="text-xs text-zinc-500">{c.personality}</p>
+              {c.voiceStyle && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-zinc-600 uppercase tracking-widest">Voice</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 capitalize">
+                    {c.voiceStyle}
+                  </span>
+                </div>
+              )}
               {c.backstory && (
                 <p className="text-xs text-zinc-600">{c.backstory}</p>
               )}

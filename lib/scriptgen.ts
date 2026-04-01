@@ -32,8 +32,13 @@ const STYLE_GUIDES: Record<ScriptStyle, string> = {
 
 export async function generateScript(
   topic: string,
-  style: ScriptStyle
+  style: ScriptStyle,
+  hook?: string
 ): Promise<Script> {
+  const hookInstruction = hook
+    ? `\nHOOK OVERRIDE: Use this exact hook: "${hook}" — do not change it.`
+    : "";
+
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 2000,
@@ -43,7 +48,7 @@ export async function generateScript(
         content: `You are a viral short-form video scriptwriter optimizing for TikTok/Reels engagement.
 
 Topic: "${topic}"
-Style: ${style} — ${STYLE_GUIDES[style]}
+Style: ${style} — ${STYLE_GUIDES[style]}${hookInstruction}
 
 Viral optimization rules:
 - HOOK: Must grab attention in the first 3 seconds. Use a pattern interrupt, shocking stat, or bold visual claim.
@@ -145,7 +150,8 @@ Respond ONLY with valid JSON:
       "appearance": "PRECISE visual description for AI video prompts: e.g. 'young woman, short silver-white hair with undercut, glowing blue cybernetic left eye, tan skin, always wearing a worn red leather jacket over black tank top, small scar above right eyebrow'",
       "personality": "2-3 personality traits that create conflict and drive story",
       "role": "protagonist",
-      "backstory": "1-2 sentences of backstory that explains their motivation"
+      "backstory": "1-2 sentences of backstory that explains their motivation",
+      "voiceStyle": "one of: terse, dramatic, sarcastic, warm, cold, chaotic — choose the one that best fits this character's personality and role"
     }
   ]
 }`,
@@ -172,7 +178,7 @@ export async function generateEpisode(
   const characterList = series.characters
     .map(
       (c) =>
-        `- ${c.name} (${c.role})\n  Appearance: ${c.appearance}\n  Personality: ${c.personality}`
+        `- ${c.name} (${c.role})\n  Appearance: ${c.appearance}\n  Personality: ${c.personality}\n  Voice Style: ${c.voiceStyle ?? "dramatic"} — When this character speaks or narrates, write in their voice style`
     )
     .join("\n");
 
