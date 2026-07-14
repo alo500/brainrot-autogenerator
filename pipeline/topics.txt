@@ -1,0 +1,51 @@
+# Brainrot Generator — Topic Bank
+# One topic per line. Comments with #.
+# Run: python batch_local.py topics.txt
+
+# History x Modern
+The fall of Rome but it's a Silicon Valley startup imploding
+Why the Library of Alexandria was basically the original internet getting DDoSed
+The Black Plague was medieval Europe's version of a system crash with no backups
+Genghis Khan ran the most efficient startup in human history
+
+# Philosophy x Internet Culture
+Nietzsche predicted TikTok and nobody talks about it
+Plato's Cave allegory is literally just doomscrolling
+Stoicism is just ancient CBT therapy with better branding
+Diogenes was the original internet troll and he was right about everything
+
+# Science x Satire
+The sun is a mass extinction event on a timer and we just don't think about it
+Your brain literally hallucinates reality and calls it consciousness
+Tardigrades survived five mass extinctions and we can't survive a Monday
+Entropy means the universe is slowly deleting itself and nothing matters
+
+# Tech x Culture
+Every social media algorithm is just a Skinner box with better graphics
+AI art discourse is just the photography vs painting debate from 1850
+The internet was supposed to connect humanity and instead it gave us parasocial relationships
+Cryptocurrency solved a problem nobody had and created twelve new ones
+
+# Economics x Comedy
+Late-stage capitalism is just a really long game of Monopoly where someone flipped the board
+Hustle culture is just medieval peasant propaganda with AirPods
+The diamond industry is the greatest marketing psyop in human history
+Rent prices prove that housing is just a subscription service for existing
+
+# Psychology x Dark Humor
+Imposter syndrome is your brain's way of saying the simulation might be real
+The sunk cost fallacy explains every bad relationship you've ever stayed in
+Nostalgia is just your brain lying to you about how good things used to be
+Every personality test is just astrology for people who think they're too smart for astrology
+
+# Art x Unexpected Angles
+The Mona Lisa is famous because someone stole it not because it's good
+Brutalist architecture is what happens when buildings have depression
+Vaporwave is just capitalism's ghost haunting a dead mall
+Bob Ross was a drill sergeant who chose violence against blank canvases instead
+
+# Sports x Philosophy
+The Olympics are just nationalism cosplaying as exercise
+Chess is the only sport where trash talk happens in complete silence
+Professional wrestling is the most honest sport because it admits it's fake
+Marathon running is just paying money to suffer in public

@@ -6,6 +6,9 @@ const nextConfig = {
       { protocol: "https", hostname: "*.klingai.com" },
     ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ["child_process"],
+  },
 };
 
 module.exports = nextConfig;

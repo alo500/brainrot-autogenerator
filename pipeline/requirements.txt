@@ -1,0 +1,30 @@
+# ─── Core pipeline ────────────────────────────────────────────────────────────
+
+# Claude script generation
+anthropic>=0.30.0
+
+# FLUX Schnell image generation via Replicate API
+replicate>=0.30.0
+
+# Microsoft Edge TTS — free, no API key required
+edge-tts>=6.1.12
+
+# Image processing (resize/crop before ffmpeg if needed)
+Pillow>=10.0.0
+
+# ─── YouTube upload ───────────────────────────────────────────────────────────
+
+google-api-python-client>=2.130.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# ─── Optional quality-of-life ─────────────────────────────────────────────────
+
+# Load .env files automatically (nice to have, not required)
+python-dotenv>=1.0.0
+
+# ─── ffmpeg ───────────────────────────────────────────────────────────────────
+# ffmpeg is called as a subprocess — install it separately:
+#   Ubuntu/Debian : sudo apt install ffmpeg
+#   macOS         : brew install ffmpeg
+#   Windows       : https://ffmpeg.org/download.html (add to PATH)
