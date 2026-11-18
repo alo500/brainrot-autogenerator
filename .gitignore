@@ -37,3 +37,8 @@ Thumbs.db
 *.tsbuildinfo
 
 pipeline/output/
+
+# platform credentials (story channels + YouTube uploader)
+pipeline/secrets/
+pipeline/client_secrets.json
+pipeline/token.json

@@ -1,0 +1,39 @@
+{
+  "_note": "Faceless story channels. Every video is fiction, says so on screen and in the caption, and is posted with the platform's AI-generated label. Keep ids in sync with analytics-dashboard/lib/channels/registry.ts.",
+  "disclosure": "Fictional story · AI-generated",
+  "negative_prompt": "text, letters, words, screen, phone screen, sign, face, faces, portrait, person looking at camera, eyes, nudity, cleavage, lingerie, gore, text, watermark, logo, stock photo, bright, cheerful, low quality, blurry",
+  "image_style": "cinematic, moody, faceless, shallow depth of field, 35mm film grain, night tones, 9:16 vertical, no visible faces",
+  "accounts": {
+    "the-verdict": {
+      "name": "The Verdict",
+      "voice": "en-US-AvaMultilingualNeural",
+      "emotions": ["judgment", "suspense", "curiosity"],
+      "formats": {
+        "dilemma": "A first-person fictional relationship or friendship dilemma. Both people have a real point. Lay out what happened in order, then the moment it blew up.",
+        "two-sides": "Tell the same fictional fight twice: first from one person's side, then the other's. The second version should reframe the first.",
+        "update": "A fictional follow-up to an earlier dilemma: what happened after, with one twist the audience didn't see coming."
+      },
+      "ending": "End by asking the viewer directly who was wrong, with two clear options they can type in the comments.",
+      "hashtags": ["#storytime", "#whoswrong", "#relationships", "#fiction", "#aita"]
+    },
+    "petty-revenge": {
+      "name": "Petty Revenge",
+      "voice": "en-US-AndrewMultilingualNeural",
+      "emotions": ["catharsis", "vindication", "suspense"],
+      "formats": {
+        "storytime": "A fictional petty-revenge story: someone is wronged in a small, relatable way (coworker, landlord, neighbor, ex) and gets back at them cleverly and legally.",
+        "karma": "A fictional story where someone's own bad behavior catches up with them without the narrator lifting a finger.",
+        "serial": "Part one of a fictional multi-part revenge story. Set up the wrong and the plan, and stop right before the payoff."
+      },
+      "ending": "Land the payoff in one short line. For serials, end on the cliffhanger and say part 2 is coming.",
+      "hashtags": ["#pettyrevenge", "#storytime", "#karma", "#fiction"]
+    }
+  },
+  "hooks": {
+    "question": "Open with a direct question to the viewer.",
+    "cold-open": "Open mid-scene at the most tense moment, then rewind.",
+    "verdict-bait": "Open by saying the internet is split on this one.",
+    "cliffhanger": "Open by teasing the ending without revealing it.",
+    "statement": "Open with one blunt, surprising statement."
+  }
+}
