@@ -141,7 +141,10 @@ def generate_script(topic: str, retries: int = 3) -> dict:
 # ---------------------------------------------------------------------------
 # Image generation via local Stable Diffusion
 # ---------------------------------------------------------------------------
-def generate_image(prompt: str, output_path: str, index: int) -> str:
+DEFAULT_NEGATIVE = "stock photo, bright, cheerful, low quality, blurry, text, watermark"
+
+
+def generate_image(prompt: str, output_path: str, index: int, negative_prompt: str = DEFAULT_NEGATIVE) -> str:
     print(f"[img] Scene {index+1}: generating image...")
 
     pipe = _get_sd_pipe()
@@ -149,7 +152,7 @@ def generate_image(prompt: str, output_path: str, index: int) -> str:
 
     image = pipe(
         prompt=prompt,
-        negative_prompt="stock photo, bright, cheerful, low quality, blurry, text, watermark",
+        negative_prompt=negative_prompt,
         width=768,
         height=1344,  # 9:16 vertical
         num_inference_steps=25,
@@ -165,11 +168,11 @@ def generate_image(prompt: str, output_path: str, index: int) -> str:
 # ---------------------------------------------------------------------------
 # TTS via edge-tts (free, no key)
 # ---------------------------------------------------------------------------
-def generate_voiceover(text: str, output_path: str) -> str:
+def generate_voiceover(text: str, output_path: str, voice: str | None = None) -> str:
     print(f"[tts] Generating voiceover ({len(text)} chars)...")
 
     async def _run():
-        comm = edge_tts.Communicate(text, TTS_VOICE)
+        comm = edge_tts.Communicate(text, voice or TTS_VOICE)
         await comm.save(output_path)
 
     asyncio.run(_run())
@@ -185,31 +188,33 @@ def assemble_video(
     image_paths: list[str],
     audio_path: str,
     output_path: str,
+    title_card: bool = True,
 ) -> str:
     print("[video] Assembling final video...")
 
     with tempfile.TemporaryDirectory() as tmp:
         clips = []
 
-        # Title card
-        title_path = os.path.join(tmp, "title.mp4")
-        title_text = script["title"].replace("'", "'\\''").replace(":", "\\:")
-        subprocess.run(
-            [
-                "ffmpeg", "-y", "-f", "lavfi",
-                "-i", f"color=c=black:s=768x1344:d=3",
-                "-vf", (
-                    f"drawtext=text='{title_text}'"
-                    f":fontcolor=white:fontsize=42:x=(w-text_w)/2:y=(h-text_h)/2"
-                    f":font=monospace"
-                    f",fade=in:0:15,fade=out:st=2.5:d=0.5"
-                ),
-                "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                title_path,
-            ],
-            capture_output=True,
-        )
-        clips.append(title_path)
+        # Title card (story channels skip it: the hook has to land in the first second)
+        if title_card:
+            title_path = os.path.join(tmp, "title.mp4")
+            title_text = script["title"].replace("'", "'\\''").replace(":", "\\:")
+            subprocess.run(
+                [
+                    "ffmpeg", "-y", "-f", "lavfi",
+                    "-i", f"color=c=black:s=768x1344:d=3",
+                    "-vf", (
+                        f"drawtext=text='{title_text}'"
+                        f":fontcolor=white:fontsize=42:x=(w-text_w)/2:y=(h-text_h)/2"
+                        f":font=monospace"
+                        f",fade=in:0:15,fade=out:st=2.5:d=0.5"
+                    ),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                    title_path,
+                ],
+                capture_output=True,
+            )
+            clips.append(title_path)
 
         # Scene clips with Ken Burns
         for i, (scene, img) in enumerate(zip(script["scenes"], image_paths)):

@@ -41,7 +41,7 @@ MAX_SHORTS_DURATION = 60
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
 
-def get_credentials() -> Credentials:
+def get_credentials(token_path: Path = TOKEN_CACHE, scopes: list[str] = SCOPES) -> Credentials:
     """
     Load or refresh OAuth2 credentials.
     First run: launches browser flow and caches token.json.
@@ -49,8 +49,8 @@ def get_credentials() -> Credentials:
     """
     creds = None
 
-    if TOKEN_CACHE.exists():
-        creds = Credentials.from_authorized_user_file(str(TOKEN_CACHE), SCOPES)
+    if token_path.exists():
+        creds = Credentials.from_authorized_user_file(str(token_path), scopes)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -65,13 +65,14 @@ def get_credentials() -> Credentials:
                     "Rename it to client_secrets.json and place it in the pipeline/ directory."
                 )
             print("[auth] Opening browser for Google OAuth consent...")
-            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS), SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS), scopes)
             creds = flow.run_local_server(port=0)
 
         # Cache token for next run
-        with open(TOKEN_CACHE, "w") as f:
+        token_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(token_path, "w") as f:
             f.write(creds.to_json())
-        print(f"[auth] Token cached at {TOKEN_CACHE.name}")
+        print(f"[auth] Token cached at {token_path.name}")
 
     return creds
 
@@ -85,6 +86,8 @@ def upload_video(
     tags: list[str],
     category: str = DEFAULT_CATEGORY,
     privacy: str = DEFAULT_PRIVACY,
+    creds: Credentials | None = None,
+    synthetic: bool = False,
 ) -> str:
     """
     Upload a video to YouTube. Returns the YouTube video ID.
@@ -96,8 +99,7 @@ def upload_video(
     if not video_path.exists():
         raise FileNotFoundError(f"Video not found: {video_path}")
 
-    creds = get_credentials()
-    youtube = build("youtube", "v3", credentials=creds)
+    youtube = build("youtube", "v3", credentials=creds or get_credentials())
 
     # Inject #Shorts so YouTube's algorithm picks it up
     shorts_description = f"{description}\n\n#Shorts"
@@ -114,6 +116,8 @@ def upload_video(
         "status": {
             "privacyStatus": privacy,
             "selfDeclaredMadeForKids": False,
+            # YouTube's "altered or synthetic content" disclosure
+            **({"containsSyntheticMedia": True} if synthetic else {}),
         },
     }
 
